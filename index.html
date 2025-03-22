@@ -152,6 +152,50 @@
             width: 3rem;
             height: 3rem;
         }
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-lg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .alert-info {
+            background-color: rgba(13, 202, 240, 0.1);
+            border: none;
+            border-radius: 10px;
+        }
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .modal-header {
+            background: linear-gradient(to right, #0d6efd, #0099ff);
+            color: white;
+            border: none;
+            padding: 1.5rem;
+        }
+        .modal-body {
+            padding: 2rem;
+        }
+        .btn-close-white {
+            filter: brightness(0) invert(1);
+        }
+        #result {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        .loading {
+            padding: 3rem;
+        }
+        .loading-spinner {
+            width: 4rem;
+            height: 4rem;
+        }
     </style>
 </head>
 <body>
@@ -394,6 +438,12 @@
                 loading.style.display = 'block';
                 result.style.display = 'none';
 
+                // Check file size
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    alert('File size must be less than 5MB');
+                    return;
+                }
+
                 // Create a unique identifier for this upload
                 const uploadId = Date.now();
                 
@@ -406,14 +456,16 @@
                     reader.onload = function(e) {
                         // Process image based on tool type
                         if (currentTool === 'background') {
-                            // Simulate background removal by adding a semi-transparent background
+                            // Simulate background removal
                             resultImage.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+                            resultImage.style.filter = 'brightness(1.1) contrast(1.1)';
                             resultImage.src = e.target.result;
                             downloadBtn.href = e.target.result;
                             downloadBtn.download = `background_removed_${uploadId}.png`;
                         } else if (currentTool === 'logo') {
                             // Simulate logo removal
                             resultImage.style.backgroundColor = '';
+                            resultImage.style.filter = 'blur(0.5px) brightness(1.05)';
                             resultImage.src = e.target.result;
                             downloadBtn.href = e.target.result;
                             downloadBtn.download = `logo_removed_${uploadId}.png`;
@@ -455,18 +507,32 @@
             
             if (tool === 'quiz') {
                 // For quiz tool, show a different message
-                modalTitle.textContent = 'Create Quiz';
+                modalTitle.textContent = 'Quiz System';
                 dropZone.innerHTML = `
                     <div class="text-center">
-                        <i class="bi bi-question-circle display-4 text-primary"></i>
-                        <h5 class="mt-3">Quiz Creation Demo</h5>
-                        <p class="text-muted">This is a demo version. In the full version, you can:</p>
-                        <ul class="text-start list-unstyled">
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Create multiple-choice questions</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Add images to questions</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Set time limits</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Track results</li>
-                        </ul>
+                        <i class="bi bi-question-circle display-4 text-primary mb-4"></i>
+                        <h5 class="mt-3 mb-4">Quiz System</h5>
+                        <div class="row justify-content-center">
+                            <div class="col-md-6 mb-3">
+                                <button class="btn btn-primary btn-lg w-100" onclick="createQuiz()">
+                                    <i class="bi bi-plus-circle me-2"></i>Create New Quiz
+                                </button>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <button class="btn btn-success btn-lg w-100" onclick="playQuiz()">
+                                    <i class="bi bi-play-circle me-2"></i>Play Quiz
+                                </button>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-4">
+                            <p class="mb-2">Available Features:</p>
+                            <ul class="text-start list-unstyled">
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Create multiple-choice questions</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Add images to questions</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Set time limits</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Track results</li>
+                            </ul>
+                        </div>
                     </div>`;
             } else {
                 // For image processing tools
@@ -478,10 +544,27 @@
                     <input type="file" id="fileInput" hidden accept="image/*">`;
                 
                 // Reattach click handler for file input
-                dropZone.onclick = () => document.getElementById('fileInput').click();
+                const fileInput = document.getElementById('fileInput');
+                dropZone.onclick = () => fileInput.click();
+                
+                // Add file input change handler
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        processImage(file);
+                    }
+                });
             }
             
             modal.show();
+        }
+
+        function createQuiz() {
+            alert('Quiz creation feature will be available in the full version. Stay tuned!');
+        }
+
+        function playQuiz() {
+            alert('Quiz playing feature will be available in the full version. Stay tuned!');
         }
     </script>
 </body>
