@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Quiz Results - Habesha Tools{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .question-feedback {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        .question-feedback.correct {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+        }
+        .question-feedback.incorrect {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+        }
+        .option {
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 0.25rem;
+        }
+        .option.selected {
+            background-color: #e3f2fd;
+            border: 1px solid #90caf9;
+        }
+        .option.correct {
+            background-color: #c8e6c9;
+            border: 1px solid #81c784;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_quiz') }}">Quizzes</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_quiz_show', {'id': result.quiz.id}) }}">{{ result.quiz.title }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Results</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h1 class="h3 mb-3">Quiz Results</h1>
+                        <div class="display-4 mb-3">
+                            {{ result.correctAnswers }}/{{ result.totalQuestions }}
+                        </div>
+                        <div class="h5 mb-4">
+                            Score: {{ result.scorePercentage }}%
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <a href="{{ path('app_quiz_take', {'id': result.quiz.id}) }}" class="btn btn-primary me-2">
+                            <i class="bi bi-arrow-clockwise"></i> Try Again
+                        </a>
+                        <a href="{{ path('app_quiz') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-list"></i> Back to Quizzes
+                        </a>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h2 class="h4 mb-3">Question Review</h2>
+                    {% for question in result.quiz.questions|sort((a, b) => a.orderNumber <=> b.orderNumber) %}
+                        {% set userAnswer = result.answers[loop.index0]|default(null) %}
+                        {% set isCorrect = userAnswer == question.correctOption %}
+                        <div class="question-feedback {% if isCorrect %}correct{% else %}incorrect{% endif %}">
+                            <h5 class="mb-3">Question {{ loop.index }}</h5>
+                            <p class="mb-3">{{ question.questionText }}</p>
+                            <div class="options">
+                                {% for option in question.options %}
+                                    <div class="option 
+                                        {% if loop.index0 == userAnswer %}selected{% endif %}
+                                        {% if loop.index0 == question.correctOption %}correct{% endif %}">
+                                        {{ option }}
+                                        {% if loop.index0 == question.correctOption %}
+                                            <i class="bi bi-check-circle-fill text-success ms-2"></i>
+                                        {% endif %}
+                                        {% if loop.index0 == userAnswer and not isCorrect %}
+                                            <i class="bi bi-x-circle-fill text-danger ms-2"></i>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if not isCorrect %}
+                                <div class="mt-2 text-danger">
+                                    <small>Your answer was incorrect. The correct answer is: {{ question.options[question.correctOption] }}</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

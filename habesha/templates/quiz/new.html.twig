@@ -1,0 +1,200 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Quiz - Habesha Tools{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .question-card {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        .remove-question {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+        }
+        .option-row {
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        .remove-option {
+            position: absolute;
+            top: 50%;
+            right: -2rem;
+            transform: translateY(-50%);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Create New Quiz</h1>
+
+            {{ form_start(form) }}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {{ form_label(form.title) }}
+                            {{ form_widget(form.title) }}
+                            {{ form_errors(form.title) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.description) }}
+                            {{ form_widget(form.description) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="mb-3">Questions</h3>
+                <div class="questions-wrapper" 
+                     data-prototype="{{ form_widget(form.questions.vars.prototype)|e('html_attr') }}"
+                     data-index="{{ form.questions|length }}">
+                    
+                    {% for questionForm in form.questions %}
+                        <div class="card question-card">
+                            <div class="card-body">
+                                <button type="button" class="btn btn-danger btn-sm remove-question">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                <div class="mb-3">
+                                    {{ form_label(questionForm.questionText, 'Question') }}
+                                    {{ form_widget(questionForm.questionText) }}
+                                    {{ form_errors(questionForm.questionText) }}
+                                </div>
+
+                                <div class="mb-3 options-wrapper"
+                                     data-prototype="{{ form_widget(questionForm.options.vars.prototype)|e('html_attr') }}"
+                                     data-index="{{ questionForm.options|length }}">
+                                    <label>Options</label>
+                                    {% for optionForm in questionForm.options %}
+                                        <div class="option-row">
+                                            {{ form_widget(optionForm) }}
+                                            <button type="button" class="btn btn-danger btn-sm remove-option">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                    <button type="button" class="btn btn-outline-secondary btn-sm add-option">
+                                        <i class="bi bi-plus"></i> Add Option
+                                    </button>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form_label(questionForm.correctOption, 'Correct Option (0-based index)') }}
+                                            {{ form_widget(questionForm.correctOption) }}
+                                            {{ form_errors(questionForm.correctOption) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form_label(questionForm.orderNumber, 'Question Order') }}
+                                            {{ form_widget(questionForm.orderNumber) }}
+                                            {{ form_errors(questionForm.orderNumber) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" class="btn btn-outline-primary mb-4" id="add-question">
+                    <i class="bi bi-plus"></i> Add Question
+                </button>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Create Quiz</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionsWrapper = document.querySelector('.questions-wrapper');
+            let questionIndex = parseInt(questionsWrapper.dataset.index);
+
+            // Add new question
+            document.getElementById('add-question').addEventListener('click', function() {
+                const prototype = questionsWrapper.dataset.prototype;
+                const newForm = prototype.replace(/__name__/g, questionIndex);
+                const questionCard = document.createElement('div');
+                questionCard.className = 'card question-card';
+                questionCard.innerHTML = `
+                    <div class="card-body">
+                        <button type="button" class="btn btn-danger btn-sm remove-question">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        ${newForm}
+                    </div>
+                `;
+                questionsWrapper.appendChild(questionCard);
+                
+                // Set initial order number
+                const orderInput = questionCard.querySelector('[id$="_orderNumber"]');
+                if (orderInput) {
+                    orderInput.value = questionIndex + 1;
+                }
+
+                // Initialize option handling for the new question
+                initializeOptionHandling(questionCard);
+                questionIndex++;
+            });
+
+            // Remove question
+            questionsWrapper.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-question')) {
+                    e.target.closest('.question-card').remove();
+                }
+            });
+
+            // Initialize option handling for existing questions
+            document.querySelectorAll('.question-card').forEach(initializeOptionHandling);
+
+            function initializeOptionHandling(questionCard) {
+                const optionsWrapper = questionCard.querySelector('.options-wrapper');
+                if (!optionsWrapper) return;
+
+                let optionIndex = parseInt(optionsWrapper.dataset.index);
+
+                // Add new option
+                const addOptionBtn = questionCard.querySelector('.add-option');
+                if (addOptionBtn) {
+                    addOptionBtn.addEventListener('click', function() {
+                        const prototype = optionsWrapper.dataset.prototype;
+                        const newForm = prototype.replace(/__name__/g, optionIndex);
+                        const optionRow = document.createElement('div');
+                        optionRow.className = 'option-row';
+                        optionRow.innerHTML = `
+                            ${newForm}
+                            <button type="button" class="btn btn-danger btn-sm remove-option">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        `;
+                        addOptionBtn.before(optionRow);
+                        optionIndex++;
+                    });
+                }
+
+                // Remove option
+                optionsWrapper.addEventListener('click', function(e) {
+                    if (e.target.closest('.remove-option')) {
+                        e.target.closest('.option-row').remove();
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %} 

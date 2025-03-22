@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Background Removed Successfully - Habesha Tools{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-check-circle-fill text-success display-1"></i>
+                        <h1 class="card-title mt-3">Background Removed Successfully!</h1>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Original Image</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ vich_uploader_asset(image_process, 'imageFile') }}" 
+                                         class="img-fluid rounded" 
+                                         alt="Original image">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Processed Image</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ asset('uploads/images/' ~ image_process.resultImageName) }}" 
+                                         class="img-fluid rounded" 
+                                         alt="Processed image">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <div class="btn-group">
+                            <a href="{{ asset('uploads/images/' ~ image_process.resultImageName) }}" 
+                               class="btn btn-success" 
+                               download="processed_image.png">
+                                <i class="bi bi-download me-2"></i>Download Result
+                            </a>
+                            <a href="{{ path('app_background_remover') }}" class="btn btn-primary">
+                                <i class="bi bi-arrow-repeat me-2"></i>Process Another Image
+                            </a>
+                            <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-house me-2"></i>Return to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

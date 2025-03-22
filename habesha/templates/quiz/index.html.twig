@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Quizzes - Habesha Tools{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Available Quizzes</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('app_quiz_new') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create New Quiz
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% if quizzes|length > 0 %}
+            {% for quiz in quizzes %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ quiz.title }}</h5>
+                            <p class="card-text">{{ quiz.description }}</p>
+                            <p class="text-muted">
+                                <small>{{ quiz.questions|length }} questions</small> •
+                                <small>Created {{ quiz.createdAt|date('Y-m-d H:i') }}</small>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ path('app_quiz_show', {'id': quiz.id}) }}" class="btn btn-outline-primary">View Details</a>
+                                <a href="{{ path('app_quiz_take', {'id': quiz.id}) }}" class="btn btn-primary">Take Quiz</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No quizzes available yet. <a href="{{ path('app_quiz_new') }}">Create one now!</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

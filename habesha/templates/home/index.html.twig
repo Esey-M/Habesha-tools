@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Habesha Tools - Home{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Welcome to Habesha Tools</h1>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Background Remover</h5>
+                    <p class="card-text">Remove backgrounds from your images using AI technology.</p>
+                    <a href="{{ path('app_background_remover') }}" class="btn btn-primary">Try it now</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Logo Remover</h5>
+                    <p class="card-text">Remove logos and watermarks from images.</p>
+                    <a href="{{ path('app_logo_remover') }}" class="btn btn-primary">Try it now</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Quiz System</h5>
+                    <p class="card-text">Create and take quizzes on various topics.</p>
+                    <a href="{{ path('app_quiz') }}" class="btn btn-primary">Try it now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

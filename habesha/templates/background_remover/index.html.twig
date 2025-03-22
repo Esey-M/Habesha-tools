@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Background Remover - Habesha Tools{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4">Background Remover</h1>
+            
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                Please note: Uploaded and processed images will be automatically deleted after 7 days.
+            </div>
+
+            {{ form_start(form, {'attr': {'class': 'card'}}) }}
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ form_label(form.imageFile) }}
+                    {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_help(form.imageFile) }}
+                    {{ form_errors(form.imageFile) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-upload me-2"></i>Upload Image
+                </button>
+            </div>
+            {{ form_end(form) }}
+
+            {% if recent_processes|length > 0 %}
+                <div class="mt-5">
+                    <h2 class="h4 mb-4">Recent Images</h2>
+                    <div class="list-group">
+                        {% for process in recent_processes %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ process.imageName }}</h6>
+                                        <small class="text-muted">
+                                            Uploaded on {{ process.updatedAt|date('M d, Y') }}
+                                            {% if process.resultImageName %}
+                                                • Processed
+                                            {% endif %}
+                                        </small>
+                                        <br>
+                                        <small class="text-danger">
+                                            Expires on {{ process.expiresAt|date('M d, Y') }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        {% if process.resultImageName %}
+                                            <a href="{{ path('app_background_remover_success', {'id': process.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i> View Result
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 
