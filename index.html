@@ -27,6 +27,20 @@
         .tool-link:hover {
             transform: translateY(-2px);
         }
+        .card-disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .coming-soon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
     </style>
 </head>
 <body>
@@ -36,46 +50,64 @@
                 <h1 class="display-4 mb-4">Habesha Tools</h1>
                 <p class="lead mb-4">A collection of useful tools for image processing and interactive quizzes.</p>
                 
+                <div class="alert alert-info mb-4">
+                    <strong>Note:</strong> This is a demo page. The application requires server-side setup to run. Please check the GitHub repository for installation instructions.
+                </div>
+
                 <div class="row g-4 justify-content-center">
                     <div class="col-md-4">
-                        <a href="/background-remover" class="tool-link">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Background Remover</h5>
-                                    <p class="card-text">Remove backgrounds from images using AI technology.</p>
-                                </div>
+                        <div class="card h-100 card-disabled position-relative">
+                            <span class="coming-soon">Demo Only</span>
+                            <div class="card-body">
+                                <h5 class="card-title">Background Remover</h5>
+                                <p class="card-text">Remove backgrounds from images using AI technology.</p>
                             </div>
-                        </a>
+                        </div>
                     </div>
                     
                     <div class="col-md-4">
-                        <a href="/logo-remover" class="tool-link">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Logo Remover</h5>
-                                    <p class="card-text">Remove logos and watermarks from images.</p>
-                                </div>
+                        <div class="card h-100 card-disabled position-relative">
+                            <span class="coming-soon">Demo Only</span>
+                            <div class="card-body">
+                                <h5 class="card-title">Logo Remover</h5>
+                                <p class="card-text">Remove logos and watermarks from images.</p>
                             </div>
-                        </a>
+                        </div>
                     </div>
                     
                     <div class="col-md-4">
-                        <a href="/quiz" class="tool-link">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Quiz System</h5>
-                                    <p class="card-text">Create and take interactive quizzes.</p>
-                                </div>
+                        <div class="card h-100 card-disabled position-relative">
+                            <span class="coming-soon">Demo Only</span>
+                            <div class="card-body">
+                                <h5 class="card-title">Quiz System</h5>
+                                <p class="card-text">Create and take interactive quizzes.</p>
                             </div>
-                        </a>
+                        </div>
                     </div>
                 </div>
 
                 <div class="mt-5">
+                    <div class="alert alert-warning">
+                        <h5>How to Run This Project</h5>
+                        <p>This is a Symfony application that requires proper server setup. To run it locally:</p>
+                        <ol class="text-start">
+                            <li>Clone the repository</li>
+                            <li>Install PHP 8.1 or higher</li>
+                            <li>Install Composer dependencies</li>
+                            <li>Set up your database</li>
+                            <li>Configure your environment variables</li>
+                        </ol>
+                        <p>For detailed instructions, please check the repository README.</p>
+                    </div>
+                    
                     <p class="text-muted">
-                        Note: Images are automatically deleted after 7 days to maintain system performance.
+                        Note: When running locally, uploaded images are automatically deleted after 7 days to maintain system performance.
                     </p>
-                    <a href="https://github.com/Esey-M/Habesha-tools" class="btn btn-outline-primary" target="_blank">
+                    
+                    <a href="https://github.com/Esey-M/Habesha-tools" class="btn btn-primary" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github me-2" viewBox="0 0 16 16">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
                         View on GitHub
                     </a>
                 </div>
