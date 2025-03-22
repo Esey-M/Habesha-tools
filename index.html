@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habesha Tools</title>
+    <meta name="description" content="Free online tools for image processing - remove backgrounds, remove logos, and create quizzes">
+    <title>Habesha Tools - Free Online Image Processing Tools</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Add Google AdSense code here -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR-CLIENT-ID" crossorigin="anonymous"></script>
     <style>
         body {
             min-height: 100vh;
@@ -57,42 +60,17 @@
             margin-bottom: 1rem;
             color: #0d6efd;
         }
-        .coming-soon {
+        .try-free {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background: #dc3545;
+            background: #28a745;
             color: white;
             padding: 0.25rem 1rem;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 500;
-            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
-        }
-        .setup-steps {
-            background: #fff9e6;
-            border-left: 4px solid #ffc107;
-            padding: 1.5rem;
-            border-radius: 8px;
-        }
-        .setup-steps ol {
-            margin-bottom: 0;
-        }
-        .setup-steps li {
-            margin-bottom: 0.5rem;
-        }
-        .setup-steps li:last-child {
-            margin-bottom: 0;
-        }
-        .github-btn {
-            padding: 0.75rem 2rem;
-            font-weight: 500;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-        }
-        .github-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
         }
         .header-section {
             text-align: center;
@@ -135,16 +113,44 @@
         .footer-links a:hover {
             color: #0d6efd;
         }
-        .modal-content {
-            border-radius: 15px;
+        .ad-container {
+            margin: 2rem 0;
+            min-height: 250px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .modal-header {
-            border-radius: 15px 15px 0 0;
-            background: linear-gradient(to right, #0d6efd, #0099ff);
-            color: white;
+        #dropZone {
+            border: 2px dashed #0d6efd;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            background: rgba(13, 110, 253, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .modal-title {
-            font-weight: 600;
+        #dropZone:hover {
+            background: rgba(13, 110, 253, 0.1);
+        }
+        #dropZone.dragover {
+            background: rgba(13, 110, 253, 0.15);
+            border-color: #0099ff;
+        }
+        .result-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
         }
     </style>
 </head>
@@ -165,12 +171,7 @@
                         <a class="nav-link active" href="#tools">Tools</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#setup">Setup</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/Esey-M/Habesha-Tools" target="_blank">
-                            <i class="bi bi-github"></i> GitHub
-                        </a>
+                        <a class="nav-link" href="#how-it-works">How It Works</a>
                     </li>
                 </ul>
             </div>
@@ -180,81 +181,117 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="container">
+            <!-- Top Ad Container -->
+            <div class="ad-container mb-4">
+                <!-- Add your responsive ad unit here -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="YOUR-CLIENT-ID"
+                     data-ad-slot="YOUR-AD-SLOT"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
             <div class="main-card">
                 <div class="card-body">
                     <div class="header-section">
-                        <h1 class="display-4">Habesha Tools</h1>
-                        <p class="lead">A collection of useful tools for image processing and interactive quizzes.</p>
-                    </div>
-
-                    <div class="alert alert-info mb-4">
-                        <i class="bi bi-info-circle-fill me-2"></i>
-                        <strong>Note:</strong> This is a demo page. The application requires server-side setup to run. Please check the GitHub repository for installation instructions.
+                        <h1 class="display-4">Free Online Tools</h1>
+                        <p class="lead">Remove backgrounds, remove logos, and create quizzes - all for free!</p>
                     </div>
 
                     <div id="tools" class="row g-4 mb-5">
                         <div class="col-md-4">
-                            <div class="tool-card" data-bs-toggle="modal" data-bs-target="#toolModal" 
-                                 data-tool="background" data-title="Background Remover">
-                                <span class="coming-soon">Demo Only</span>
+                            <div class="tool-card" onclick="openTool('background')">
+                                <span class="try-free">Try Free</span>
                                 <div class="card-body text-center">
                                     <i class="bi bi-image tool-icon"></i>
                                     <h5 class="card-title">Background Remover</h5>
-                                    <p class="card-text">Remove backgrounds from images using AI technology.</p>
+                                    <p class="card-text">Remove backgrounds from images instantly using AI technology.</p>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="col-md-4">
-                            <div class="tool-card" data-bs-toggle="modal" data-bs-target="#toolModal"
-                                 data-tool="logo" data-title="Logo Remover">
-                                <span class="coming-soon">Demo Only</span>
+                            <div class="tool-card" onclick="openTool('logo')">
+                                <span class="try-free">Try Free</span>
                                 <div class="card-body text-center">
                                     <i class="bi bi-vector-pen tool-icon"></i>
                                     <h5 class="card-title">Logo Remover</h5>
-                                    <p class="card-text">Remove logos and watermarks from images.</p>
+                                    <p class="card-text">Remove unwanted logos and watermarks from your images.</p>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="col-md-4">
-                            <div class="tool-card" data-bs-toggle="modal" data-bs-target="#toolModal"
-                                 data-tool="quiz" data-title="Quiz System">
-                                <span class="coming-soon">Demo Only</span>
+                            <div class="tool-card" onclick="openTool('quiz')">
+                                <span class="try-free">Try Free</span>
                                 <div class="card-body text-center">
                                     <i class="bi bi-question-circle tool-icon"></i>
-                                    <h5 class="card-title">Quiz System</h5>
-                                    <p class="card-text">Create and take interactive quizzes.</p>
+                                    <h5 class="card-title">Quiz Creator</h5>
+                                    <p class="card-text">Create engaging quizzes for learning and entertainment.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div id="setup" class="setup-steps mb-4">
-                        <h5 class="mb-3"><i class="bi bi-gear-fill me-2"></i>How to Run This Project</h5>
-                        <p>This is a Symfony application that requires proper server setup. To run it locally:</p>
-                        <ol>
-                            <li>Clone the repository</li>
-                            <li>Install PHP 8.1 or higher</li>
-                            <li>Install Composer dependencies</li>
-                            <li>Set up your database</li>
-                            <li>Configure your environment variables</li>
-                        </ol>
-                        <p class="mb-0 mt-3 text-muted"><small>For detailed instructions, please check the repository README.</small></p>
+                    <!-- Side Ad Container -->
+                    <div class="ad-container">
+                        <!-- Add your responsive ad unit here -->
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="YOUR-CLIENT-ID"
+                             data-ad-slot="YOUR-AD-SLOT"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
                     </div>
 
-                    <div class="text-center">
-                        <p class="text-muted mb-4">
-                            <i class="bi bi-clock-history me-2"></i>
-                            When running locally, uploaded images are automatically deleted after 7 days to maintain system performance.
-                        </p>
-                        
-                        <a href="https://github.com/Esey-M/Habesha-Tools" class="btn btn-primary github-btn" target="_blank">
-                            <i class="bi bi-github me-2"></i>
-                            View on GitHub
-                        </a>
+                    <div id="how-it-works" class="mb-4">
+                        <h3 class="mb-4">How It Works</h3>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center mb-4">
+                                    <i class="bi bi-upload display-4 text-primary"></i>
+                                    <h5 class="mt-3">1. Upload Image</h5>
+                                    <p>Select or drag & drop your image</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center mb-4">
+                                    <i class="bi bi-magic display-4 text-primary"></i>
+                                    <h5 class="mt-3">2. Process</h5>
+                                    <p>Our AI processes your image</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center mb-4">
+                                    <i class="bi bi-download display-4 text-primary"></i>
+                                    <h5 class="mt-3">3. Download</h5>
+                                    <p>Get your processed image</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Bottom Ad Container -->
+            <div class="ad-container mt-4">
+                <!-- Add your responsive ad unit here -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="YOUR-CLIENT-ID"
+                     data-ad-slot="YOUR-AD-SLOT"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
             </div>
         </div>
     </div>
@@ -269,8 +306,10 @@
                 <div class="col-md-6 text-md-end">
                     <ul class="footer-links">
                         <li><a href="#tools">Tools</a></li>
-                        <li><a href="#setup">Setup</a></li>
-                        <li><a href="https://github.com/Esey-M/Habesha-Tools" target="_blank">GitHub</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Use</a></li>
+                        <li><a href="contact.html">Contact</a></li>
                     </ul>
                 </div>
             </div>
@@ -279,25 +318,33 @@
 
     <!-- Tool Modal -->
     <div class="modal fade" id="toolModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Tool Information</h5>
+                    <h5 class="modal-title">Process Image</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>This tool is currently available only in the full application. To use it:</p>
-                    <ol>
-                        <li>Clone the repository from GitHub</li>
-                        <li>Follow the setup instructions in the README</li>
-                        <li>Run the application locally</li>
-                    </ol>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <a href="https://github.com/Esey-M/Habesha-Tools" class="btn btn-primary" target="_blank">
-                        <i class="bi bi-github me-2"></i>View on GitHub
-                    </a>
+                    <div id="dropZone" onclick="document.getElementById('fileInput').click()">
+                        <i class="bi bi-cloud-upload display-4 text-primary"></i>
+                        <h5 class="mt-3">Drop your image here or click to upload</h5>
+                        <p class="text-muted">Supports JPG, PNG - Max 5MB</p>
+                        <input type="file" id="fileInput" hidden accept="image/*">
+                    </div>
+                    <div id="loading" class="loading">
+                        <div class="spinner-border text-primary loading-spinner" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Processing your image...</p>
+                    </div>
+                    <div id="result" class="text-center mt-4" style="display: none;">
+                        <img id="resultImage" class="result-image mb-3" src="" alt="Processed image">
+                        <div>
+                            <a id="downloadBtn" href="#" class="btn btn-primary" download>
+                                <i class="bi bi-download me-2"></i>Download Result
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -305,18 +352,60 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Handle tool card clicks
         document.addEventListener('DOMContentLoaded', function() {
-            const toolModal = document.getElementById('toolModal');
-            toolModal.addEventListener('show.bs.modal', function(event) {
-                const button = event.relatedTarget;
-                const tool = button.getAttribute('data-tool');
-                const title = button.getAttribute('data-title');
-                const modalTitle = toolModal.querySelector('.modal-title');
-                modalTitle.textContent = title;
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const resultImage = document.getElementById('resultImage');
+            const downloadBtn = document.getElementById('downloadBtn');
+            let currentTool = '';
+
+            // Handle drag and drop
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
             });
 
-            // Smooth scroll for navigation links
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    processImage(file);
+                }
+            });
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files[0]) {
+                    processImage(fileInput.files[0]);
+                }
+            });
+
+            // Simulate image processing
+            function processImage(file) {
+                dropZone.style.display = 'none';
+                loading.style.display = 'block';
+                result.style.display = 'none';
+
+                // Simulate processing delay
+                setTimeout(() => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        resultImage.src = e.target.result;
+                        downloadBtn.href = e.target.result;
+                        loading.style.display = 'none';
+                        result.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }, 2000);
+            }
+
+            // Smooth scroll
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -330,6 +419,12 @@
                 });
             });
         });
+
+        function openTool(tool) {
+            currentTool = tool;
+            const modal = new bootstrap.Modal(document.getElementById('toolModal'));
+            modal.show();
+        }
     </script>
 </body>
 </html> 
