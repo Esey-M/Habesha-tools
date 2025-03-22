@@ -9,8 +9,22 @@
     <style>
         body {
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 2rem 0;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+        .main-content {
+            flex: 1;
+            padding: 4rem 0;
         }
         .main-card {
             max-width: 1200px;
@@ -29,6 +43,7 @@
             height: 100%;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
         .tool-card:hover {
             transform: translateY(-5px);
@@ -96,79 +111,192 @@
             font-size: 1.2rem;
             margin-bottom: 0;
         }
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            margin-top: auto;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .footer-links li {
+            display: inline-block;
+            margin-right: 1.5rem;
+        }
+        .footer-links a {
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .footer-links a:hover {
+            color: #0d6efd;
+        }
+        .modal-content {
+            border-radius: 15px;
+        }
+        .modal-header {
+            border-radius: 15px 15px 0 0;
+            background: linear-gradient(to right, #0d6efd, #0099ff);
+            color: white;
+        }
+        .modal-title {
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="main-card">
-            <div class="card-body">
-                <div class="header-section">
-                    <h1 class="display-4">Habesha Tools</h1>
-                    <p class="lead">A collection of useful tools for image processing and interactive quizzes.</p>
-                </div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-tools me-2"></i>
+                Habesha Tools
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#tools">Tools</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#setup">Setup</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/Esey-M/Habesha-Tools" target="_blank">
+                            <i class="bi bi-github"></i> GitHub
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-                <div class="alert alert-info mb-4">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    <strong>Note:</strong> This is a demo page. The application requires server-side setup to run. Please check the GitHub repository for installation instructions.
-                </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="main-card">
+                <div class="card-body">
+                    <div class="header-section">
+                        <h1 class="display-4">Habesha Tools</h1>
+                        <p class="lead">A collection of useful tools for image processing and interactive quizzes.</p>
+                    </div>
 
-                <div class="row g-4 mb-5">
-                    <div class="col-md-4">
-                        <div class="tool-card">
-                            <span class="coming-soon">Demo Only</span>
-                            <div class="card-body text-center">
-                                <i class="bi bi-image tool-icon"></i>
-                                <h5 class="card-title">Background Remover</h5>
-                                <p class="card-text">Remove backgrounds from images using AI technology.</p>
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <strong>Note:</strong> This is a demo page. The application requires server-side setup to run. Please check the GitHub repository for installation instructions.
+                    </div>
+
+                    <div id="tools" class="row g-4 mb-5">
+                        <div class="col-md-4">
+                            <div class="tool-card" data-bs-toggle="modal" data-bs-target="#toolModal" 
+                                 data-tool="background" data-title="Background Remover">
+                                <span class="coming-soon">Demo Only</span>
+                                <div class="card-body text-center">
+                                    <i class="bi bi-image tool-icon"></i>
+                                    <h5 class="card-title">Background Remover</h5>
+                                    <p class="card-text">Remove backgrounds from images using AI technology.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="tool-card" data-bs-toggle="modal" data-bs-target="#toolModal"
+                                 data-tool="logo" data-title="Logo Remover">
+                                <span class="coming-soon">Demo Only</span>
+                                <div class="card-body text-center">
+                                    <i class="bi bi-vector-pen tool-icon"></i>
+                                    <h5 class="card-title">Logo Remover</h5>
+                                    <p class="card-text">Remove logos and watermarks from images.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="tool-card" data-bs-toggle="modal" data-bs-target="#toolModal"
+                                 data-tool="quiz" data-title="Quiz System">
+                                <span class="coming-soon">Demo Only</span>
+                                <div class="card-body text-center">
+                                    <i class="bi bi-question-circle tool-icon"></i>
+                                    <h5 class="card-title">Quiz System</h5>
+                                    <p class="card-text">Create and take interactive quizzes.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-4">
-                        <div class="tool-card">
-                            <span class="coming-soon">Demo Only</span>
-                            <div class="card-body text-center">
-                                <i class="bi bi-vector-pen tool-icon"></i>
-                                <h5 class="card-title">Logo Remover</h5>
-                                <p class="card-text">Remove logos and watermarks from images.</p>
-                            </div>
-                        </div>
+
+                    <div id="setup" class="setup-steps mb-4">
+                        <h5 class="mb-3"><i class="bi bi-gear-fill me-2"></i>How to Run This Project</h5>
+                        <p>This is a Symfony application that requires proper server setup. To run it locally:</p>
+                        <ol>
+                            <li>Clone the repository</li>
+                            <li>Install PHP 8.1 or higher</li>
+                            <li>Install Composer dependencies</li>
+                            <li>Set up your database</li>
+                            <li>Configure your environment variables</li>
+                        </ol>
+                        <p class="mb-0 mt-3 text-muted"><small>For detailed instructions, please check the repository README.</small></p>
                     </div>
-                    
-                    <div class="col-md-4">
-                        <div class="tool-card">
-                            <span class="coming-soon">Demo Only</span>
-                            <div class="card-body text-center">
-                                <i class="bi bi-question-circle tool-icon"></i>
-                                <h5 class="card-title">Quiz System</h5>
-                                <p class="card-text">Create and take interactive quizzes.</p>
-                            </div>
-                        </div>
+
+                    <div class="text-center">
+                        <p class="text-muted mb-4">
+                            <i class="bi bi-clock-history me-2"></i>
+                            When running locally, uploaded images are automatically deleted after 7 days to maintain system performance.
+                        </p>
+                        
+                        <a href="https://github.com/Esey-M/Habesha-Tools" class="btn btn-primary github-btn" target="_blank">
+                            <i class="bi bi-github me-2"></i>
+                            View on GitHub
+                        </a>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="setup-steps mb-4">
-                    <h5 class="mb-3"><i class="bi bi-gear-fill me-2"></i>How to Run This Project</h5>
-                    <p>This is a Symfony application that requires proper server setup. To run it locally:</p>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">© 2024 Habesha Tools. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <ul class="footer-links">
+                        <li><a href="#tools">Tools</a></li>
+                        <li><a href="#setup">Setup</a></li>
+                        <li><a href="https://github.com/Esey-M/Habesha-Tools" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Tool Modal -->
+    <div class="modal fade" id="toolModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tool Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This tool is currently available only in the full application. To use it:</p>
                     <ol>
-                        <li>Clone the repository</li>
-                        <li>Install PHP 8.1 or higher</li>
-                        <li>Install Composer dependencies</li>
-                        <li>Set up your database</li>
-                        <li>Configure your environment variables</li>
+                        <li>Clone the repository from GitHub</li>
+                        <li>Follow the setup instructions in the README</li>
+                        <li>Run the application locally</li>
                     </ol>
-                    <p class="mb-0 mt-3 text-muted"><small>For detailed instructions, please check the repository README.</small></p>
                 </div>
-
-                <div class="text-center">
-                    <p class="text-muted mb-4">
-                        <i class="bi bi-clock-history me-2"></i>
-                        When running locally, uploaded images are automatically deleted after 7 days to maintain system performance.
-                    </p>
-                    
-                    <a href="https://github.com/Esey-M/Habesha-Tools" class="btn btn-primary github-btn" target="_blank">
-                        <i class="bi bi-github me-2"></i>
-                        View on GitHub
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="https://github.com/Esey-M/Habesha-Tools" class="btn btn-primary" target="_blank">
+                        <i class="bi bi-github me-2"></i>View on GitHub
                     </a>
                 </div>
             </div>
@@ -176,5 +304,32 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle tool card clicks
+        document.addEventListener('DOMContentLoaded', function() {
+            const toolModal = document.getElementById('toolModal');
+            toolModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const tool = button.getAttribute('data-tool');
+                const title = button.getAttribute('data-title');
+                const modalTitle = toolModal.querySelector('.modal-title');
+                modalTitle.textContent = title;
+            });
+
+            // Smooth scroll for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html> 
