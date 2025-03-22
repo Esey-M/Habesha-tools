@@ -209,7 +209,7 @@
                                 <div class="card-body text-center">
                                     <i class="bi bi-image tool-icon"></i>
                                     <h5 class="card-title">Background Remover</h5>
-                                    <p class="card-text">Remove backgrounds from images instantly using AI technology.</p>
+                                    <p class="card-text">Remove backgrounds from images instantly using AI technology. Perfect for product photos and portraits.</p>
                                 </div>
                             </div>
                         </div>
@@ -220,18 +220,18 @@
                                 <div class="card-body text-center">
                                     <i class="bi bi-vector-pen tool-icon"></i>
                                     <h5 class="card-title">Logo Remover</h5>
-                                    <p class="card-text">Remove unwanted logos and watermarks from your images.</p>
+                                    <p class="card-text">Remove unwanted logos, watermarks, and text from your images. Restore images to their original state.</p>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="col-md-4">
                             <div class="tool-card" onclick="openTool('quiz')">
-                                <span class="try-free">Try Free</span>
+                                <span class="try-free">Demo</span>
                                 <div class="card-body text-center">
                                     <i class="bi bi-question-circle tool-icon"></i>
                                     <h5 class="card-title">Quiz Creator</h5>
-                                    <p class="card-text">Create engaging quizzes for learning and entertainment.</p>
+                                    <p class="card-text">Create interactive quizzes with multiple choice questions, images, and time limits. Track results and progress.</p>
                                 </div>
                             </div>
                         </div>
@@ -388,16 +388,36 @@
 
             // Simulate image processing
             function processImage(file) {
+                if (!currentTool || currentTool === 'quiz') return;
+                
                 dropZone.style.display = 'none';
                 loading.style.display = 'block';
                 result.style.display = 'none';
+
+                // Create a unique identifier for this upload
+                const uploadId = Date.now();
+                
+                // Store the tool type with the upload
+                sessionStorage.setItem(`tool_${uploadId}`, currentTool);
 
                 // Simulate processing delay
                 setTimeout(() => {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        resultImage.src = e.target.result;
-                        downloadBtn.href = e.target.result;
+                        // Process image based on tool type
+                        if (currentTool === 'background') {
+                            // Simulate background removal by adding a semi-transparent background
+                            resultImage.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+                            resultImage.src = e.target.result;
+                            downloadBtn.href = e.target.result;
+                            downloadBtn.download = `background_removed_${uploadId}.png`;
+                        } else if (currentTool === 'logo') {
+                            // Simulate logo removal
+                            resultImage.style.backgroundColor = '';
+                            resultImage.src = e.target.result;
+                            downloadBtn.href = e.target.result;
+                            downloadBtn.download = `logo_removed_${uploadId}.png`;
+                        }
                         loading.style.display = 'none';
                         result.style.display = 'block';
                     };
@@ -423,6 +443,44 @@
         function openTool(tool) {
             currentTool = tool;
             const modal = new bootstrap.Modal(document.getElementById('toolModal'));
+            const modalTitle = document.querySelector('.modal-title');
+            const dropZone = document.getElementById('dropZone');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            // Reset the form state
+            dropZone.style.display = 'block';
+            loading.style.display = 'none';
+            result.style.display = 'none';
+            
+            if (tool === 'quiz') {
+                // For quiz tool, show a different message
+                modalTitle.textContent = 'Create Quiz';
+                dropZone.innerHTML = `
+                    <div class="text-center">
+                        <i class="bi bi-question-circle display-4 text-primary"></i>
+                        <h5 class="mt-3">Quiz Creation Demo</h5>
+                        <p class="text-muted">This is a demo version. In the full version, you can:</p>
+                        <ul class="text-start list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Create multiple-choice questions</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Add images to questions</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Set time limits</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Track results</li>
+                        </ul>
+                    </div>`;
+            } else {
+                // For image processing tools
+                modalTitle.textContent = tool === 'background' ? 'Remove Background' : 'Remove Logo';
+                dropZone.innerHTML = `
+                    <i class="bi bi-cloud-upload display-4 text-primary"></i>
+                    <h5 class="mt-3">Drop your image here or click to upload</h5>
+                    <p class="text-muted">Supports JPG, PNG - Max 5MB</p>
+                    <input type="file" id="fileInput" hidden accept="image/*">`;
+                
+                // Reattach click handler for file input
+                dropZone.onclick = () => document.getElementById('fileInput').click();
+            }
+            
             modal.show();
         }
     </script>
