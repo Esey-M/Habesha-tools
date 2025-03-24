@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class ImageCleanupService
@@ -13,23 +14,30 @@ class ImageCleanupService
     public function __construct(
         private string $publicUploadDir,
         private string $privateUploadDir,
-        private SessionInterface $session,
+        private SessionFactory $sessionFactory,
         private Filesystem $filesystem
     ) {}
 
+    private function getSession(): SessionInterface
+    {
+        return $this->sessionFactory->createSession();
+    }
+
     public function trackImage(string $fileName): void
     {
-        $images = $this->session->get(self::SESSION_KEY, []);
+        $session = $this->getSession();
+        $images = $session->get(self::SESSION_KEY, []);
         $images[] = [
             'fileName' => $fileName,
             'timestamp' => time()
         ];
-        $this->session->set(self::SESSION_KEY, $images);
+        $session->set(self::SESSION_KEY, $images);
     }
 
     public function cleanup(): void
     {
-        $images = $this->session->get(self::SESSION_KEY, []);
+        $session = $this->getSession();
+        $images = $session->get(self::SESSION_KEY, []);
         $currentTime = time();
 
         foreach ($images as $key => $image) {
@@ -42,7 +50,7 @@ class ImageCleanupService
             }
         }
 
-        $this->session->set(self::SESSION_KEY, array_values($images));
+        $session->set(self::SESSION_KEY, array_values($images));
     }
 
     private function deleteImage(string $fileName): void
