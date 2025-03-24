@@ -15,60 +15,64 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/background-remover')]
 class BackgroundRemoverController extends AbstractController
 {
+    private string $uploadDir;
+    private string $privateUploadDir;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private BackgroundRemovalService $backgroundRemovalService
-    ) {}
+    ) {
+        $this->uploadDir = dirname(__DIR__, 2) . '/public/uploads/background-remover';
+        $this->privateUploadDir = dirname(__DIR__, 2) . '/private/uploads/background-remover';
+        
+        if (!file_exists($this->uploadDir)) {
+            mkdir($this->uploadDir, 0777, true);
+        }
+        if (!file_exists($this->privateUploadDir)) {
+            mkdir($this->privateUploadDir, 0777, true);
+        }
+    }
 
     #[Route('/', name: 'app_background_remover')]
-    public function index(Request $request, ImageProcessRepository $imageProcessRepository): Response
+    public function index(Request $request): Response
     {
-        $imageProcess = new ImageProcess();
-        $imageProcess->setProcessType('background_remover');
-        
-        $form = $this->createForm(BackgroundRemoverType::class, $imageProcess);
+        $form = $this->createForm(BackgroundRemoverType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                // Debug information about the uploaded file
-                $uploadedFile = $form->get('imageFile')->getData();
-                error_log("Uploaded file info:");
-                error_log("Original name: " . $uploadedFile->getClientOriginalName());
-                error_log("MIME type: " . $uploadedFile->getMimeType());
-                error_log("Size: " . $uploadedFile->getSize() . " bytes");
-                error_log("Error code: " . $uploadedFile->getError());
-                
-                // First persist the entity to save the file
-                $this->entityManager->persist($imageProcess);
-                $this->entityManager->flush();
-                
-                // Now process the image
-                $resultFileName = $this->backgroundRemovalService->removeBackground($imageProcess);
-                
-                // Update the entity with the result
-                $imageProcess->setResultImageName($resultFileName);
-                
-                // Save the result
+            $data = $form->getData();
+            $file = $data['image'];
+
+            if ($file) {
+                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+                $privatePath = $this->privateUploadDir . '/' . $fileName;
+                $publicPath = $this->uploadDir . '/' . $fileName;
+
+                // Store original file in private directory
+                $file->move($this->privateUploadDir, $fileName);
+
+                // Process the image
+                $processedImage = $this->backgroundRemovalService->removeBackground($privatePath);
+
+                // Save processed image in public directory
+                $processedImage->save($publicPath);
+
+                // Create a record in the database
+                $image = new BackgroundRemover();
+                $image->setOriginalName($file->getClientOriginalName());
+                $image->setFileName($fileName);
+                $image->setProcessedAt(new \DateTimeImmutable());
+                $image->setUserId($this->getUser() ? $this->getUser()->getId() : null);
+
+                $this->entityManager->persist($image);
                 $this->entityManager->flush();
 
-                return $this->redirectToRoute('app_background_remover_success', ['id' => $imageProcess->getId()]);
-            } catch (\Exception $e) {
-                error_log("Error in controller: " . $e->getMessage());
-                error_log("Stack trace: " . $e->getTraceAsString());
-                $this->addFlash('error', 'Failed to process image: ' . $e->getMessage());
+                return $this->redirectToRoute('app_background_remover_result', ['id' => $image->getId()]);
             }
-        } elseif ($form->isSubmitted()) {
-            error_log("Form validation errors: " . json_encode($form->getErrors(true)));
         }
 
         return $this->render('background_remover/index.html.twig', [
-            'form' => $form,
-            'recent_processes' => $imageProcessRepository->findBy(
-                ['processType' => 'background_remover'],
-                ['updatedAt' => 'DESC'],
-                5
-            )
+            'form' => $form
         ]);
     }
 
@@ -82,5 +86,35 @@ class BackgroundRemoverController extends AbstractController
         return $this->render('background_remover/success.html.twig', [
             'image_process' => $imageProcess,
         ]);
+    }
+
+    #[Route('/result/{id}', name: 'app_background_remover_result')]
+    public function result(BackgroundRemover $image): Response
+    {
+        // Check if the user has access to this image
+        if ($this->getUser() && $image->getUserId() !== $this->getUser()->getId()) {
+            throw $this->createAccessDeniedException('You do not have access to this image.');
+        }
+
+        return $this->render('background_remover/result.html.twig', [
+            'image' => $image
+        ]);
+    }
+
+    #[Route('/download/{id}', name: 'app_background_remover_download')]
+    public function download(BackgroundRemover $image): Response
+    {
+        // Check if the user has access to this image
+        if ($this->getUser() && $image->getUserId() !== $this->getUser()->getId()) {
+            throw $this->createAccessDeniedException('You do not have access to this image.');
+        }
+
+        $filePath = $this->uploadDir . '/' . $image->getFileName();
+        
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('File not found.');
+        }
+
+        return $this->file($filePath, $image->getOriginalName());
     }
 } 
