@@ -36,3 +36,5 @@ services:
         arguments:
             $publicUploadDir: '%kernel.project_dir%/public/uploads/background-remover'
             $privateUploadDir: '%kernel.project_dir%/private/uploads/background-remover'
+            $session: '@session'
+            $filesystem: '@filesystem'
