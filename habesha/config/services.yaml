@@ -30,7 +30,7 @@ services:
 
     App\Service\BackgroundRemovalService:
         arguments:
-            $params: '@parameter_bag'
+            $kernel: '@kernel'
 
     App\Service\ImageCleanupService:
         arguments:
