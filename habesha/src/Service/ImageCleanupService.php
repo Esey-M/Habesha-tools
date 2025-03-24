@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Session\SessionFactory;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class ImageCleanupService
@@ -14,13 +14,13 @@ class ImageCleanupService
     public function __construct(
         private string $publicUploadDir,
         private string $privateUploadDir,
-        private SessionFactory $sessionFactory,
+        private RequestStack $requestStack,
         private Filesystem $filesystem
     ) {}
 
     private function getSession(): SessionInterface
     {
-        return $this->sessionFactory->createSession();
+        return $this->requestStack->getSession();
     }
 
     public function trackImage(string $fileName): void
