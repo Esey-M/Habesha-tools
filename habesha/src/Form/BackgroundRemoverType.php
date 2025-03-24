@@ -4,26 +4,31 @@ namespace App\Form;
 
 use App\Entity\ImageProcess;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Vich\UploaderBundle\Form\Type\VichImageType;
+use Symfony\Component\Validator\Constraints\File;
 
 class BackgroundRemoverType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('imageFile', VichImageType::class, [
+            ->add('imageFile', FileType::class, [
+                'label' => 'Image',
+                'mapped' => false,
                 'required' => true,
-                'allow_delete' => false,
-                'delete_label' => 'Delete image',
-                'download_uri' => false,
-                'image_uri' => true,
-                'asset_helper' => true,
-                'attr' => [
-                    'class' => 'form-control',
-                    'accept' => 'image/*'
-                ]
+                'constraints' => [
+                    new File([
+                        'maxSize' => '5M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/gif',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image file (JPEG, PNG, GIF)',
+                    ])
+                ],
             ])
         ;
     }

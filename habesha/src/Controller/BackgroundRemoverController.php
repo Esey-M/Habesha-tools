@@ -36,63 +36,63 @@ class BackgroundRemoverController extends AbstractController
     }
 
     #[Route('/', name: 'app_background_remover')]
-    public function index(Request $request): Response
+    public function index(Request $request, ImageProcessRepository $imageProcessRepository): Response
     {
-        // Cleanup old images
-        $this->imageCleanupService->cleanup();
-
-        $form = $this->createForm(BackgroundRemoverType::class);
+        $imageProcess = new ImageProcess();
+        $imageProcess->setProcessType('background_remover');
+        
+        $form = $this->createForm(BackgroundRemoverType::class, $imageProcess);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $file = $data['image'];
+            try {
+                $uploadedFile = $form->get('imageFile')->getData();
+                
+                if ($uploadedFile) {
+                    // Generate a unique name for the file
+                    $fileName = uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
+                    
+                    // Move the file to the private directory
+                    $uploadedFile->move($this->privateUploadDir, $fileName);
+                    
+                    // Set the file name in the entity
+                    $imageProcess->setImageName($fileName);
+                    
+                    // Save the entity
+                    $this->entityManager->persist($imageProcess);
+                    $this->entityManager->flush();
 
-            if ($file) {
-                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-                $privatePath = $this->privateUploadDir . '/' . $fileName;
-                $publicPath = $this->uploadDir . '/' . $fileName;
+                    // Process the image
+                    $resultFileName = $this->backgroundRemovalService->removeBackground($imageProcess);
+                    
+                    // Update the entity with the result
+                    $imageProcess->setResultImageName($resultFileName);
+                    $this->entityManager->flush();
 
-                // Store original file in private directory
-                $file->move($this->privateUploadDir, $fileName);
-
-                // Process the image
-                $processedImage = $this->backgroundRemovalService->removeBackground($privatePath);
-
-                // Save processed image in public directory
-                $processedImage->save($publicPath);
-
-                // Track the image for cleanup
-                $this->imageCleanupService->trackImage($fileName);
-
-                // Create a record in the database
-                $image = new BackgroundRemover();
-                $image->setOriginalName($file->getClientOriginalName());
-                $image->setFileName($fileName);
-                $image->setProcessedAt(new \DateTimeImmutable());
-                $image->setUserId($this->getUser() ? $this->getUser()->getId() : null);
-
-                $this->entityManager->persist($image);
-                $this->entityManager->flush();
-
-                return $this->redirectToRoute('app_background_remover_result', ['id' => $image->getId()]);
+                    return $this->redirectToRoute('app_background_remover_success', ['id' => $imageProcess->getId()]);
+                }
+            } catch (\Exception $e) {
+                error_log("Error in controller: " . $e->getMessage());
+                error_log("Stack trace: " . $e->getTraceAsString());
+                $this->addFlash('error', 'Failed to process image: ' . $e->getMessage());
             }
         }
 
         return $this->render('background_remover/index.html.twig', [
-            'form' => $form
+            'form' => $form,
+            'recent_processes' => $imageProcessRepository->findBy(
+                ['processType' => 'background_remover'],
+                ['updatedAt' => 'DESC'],
+                5
+            )
         ]);
     }
 
     #[Route('/success/{id}', name: 'app_background_remover_success')]
     public function success(ImageProcess $imageProcess): Response
     {
-        if (!$imageProcess->getResultImageName()) {
-            throw $this->createNotFoundException('No processed image found.');
-        }
-
         return $this->render('background_remover/success.html.twig', [
-            'image_process' => $imageProcess,
+            'imageProcess' => $imageProcess
         ]);
     }
 
