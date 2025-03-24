@@ -8,7 +8,7 @@ parameters:
     app.upload_directory: '%kernel.project_dir%/public/uploads/images'
     app.python_script_path: '%kernel.project_dir%/scripts/remove_background.py'
     app.python_script_path_logo: '%kernel.project_dir%/scripts/remove_logo.py'
-    app.python_path: '%kernel.project_dir%/venv/bin/python3.13'
+    app.python_path: '%kernel.project_dir%/venv/bin/python3'
 
 services:
     # default configuration for services in *this* file

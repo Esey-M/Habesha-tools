@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 #[Route('/background-remover')]
 class BackgroundRemoverController extends AbstractController
@@ -22,15 +23,22 @@ class BackgroundRemoverController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private BackgroundRemovalService $backgroundRemovalService,
-        private ImageCleanupService $imageCleanupService
+        private ImageCleanupService $imageCleanupService,
+        private KernelInterface $kernel
     ) {
-        $this->uploadDir = dirname(__DIR__, 2) . '/public/uploads/background-remover';
-        $this->privateUploadDir = dirname(__DIR__, 2) . '/private/uploads/background-remover';
+        // Get absolute paths
+        $this->uploadDir = $kernel->getProjectDir() . '/public/uploads/background-remover';
+        $this->privateUploadDir = $kernel->getProjectDir() . '/private/uploads/background-remover';
+        
+        error_log("Upload directory: " . $this->uploadDir);
+        error_log("Private upload directory: " . $this->privateUploadDir);
         
         if (!file_exists($this->uploadDir)) {
+            error_log("Creating public upload directory");
             mkdir($this->uploadDir, 0777, true);
         }
         if (!file_exists($this->privateUploadDir)) {
+            error_log("Creating private upload directory");
             mkdir($this->privateUploadDir, 0777, true);
         }
     }
@@ -51,9 +59,18 @@ class BackgroundRemoverController extends AbstractController
                 if ($uploadedFile) {
                     // Generate a unique name for the file
                     $fileName = uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
+                    error_log("Generated filename: " . $fileName);
                     
                     // Move the file to the private directory
+                    $targetPath = $this->privateUploadDir . '/' . $fileName;
+                    error_log("Moving uploaded file to: " . $targetPath);
                     $uploadedFile->move($this->privateUploadDir, $fileName);
+                    
+                    if (!file_exists($targetPath)) {
+                        error_log("ERROR: File was not moved successfully!");
+                        throw new \RuntimeException('Failed to move uploaded file');
+                    }
+                    error_log("File moved successfully. Size: " . filesize($targetPath));
                     
                     // Set the file name in the entity
                     $imageProcess->setImageName($fileName);
@@ -61,14 +78,18 @@ class BackgroundRemoverController extends AbstractController
                     // Save the entity
                     $this->entityManager->persist($imageProcess);
                     $this->entityManager->flush();
+                    error_log("Saved image process entity with ID: " . $imageProcess->getId());
 
                     // Process the image
+                    error_log("Starting background removal process");
                     $resultFileName = $this->backgroundRemovalService->removeBackground($imageProcess);
+                    error_log("Background removal completed. Result file: " . $resultFileName);
                     
                     // Update the entity with the result
                     $imageProcess->setResultImageName($resultFileName);
                     $this->entityManager->flush();
 
+                    error_log("Redirecting to success page");
                     return $this->redirectToRoute('app_background_remover_success', ['id' => $imageProcess->getId()]);
                 }
             } catch (\Exception $e) {
@@ -91,6 +112,14 @@ class BackgroundRemoverController extends AbstractController
     #[Route('/success/{id}', name: 'app_background_remover_success')]
     public function success(ImageProcess $imageProcess): Response
     {
+        error_log("Success page for image process ID: " . $imageProcess->getId());
+        error_log("Result image name: " . $imageProcess->getResultImageName());
+        error_log("Checking if result file exists: " . $this->uploadDir . '/' . $imageProcess->getResultImageName());
+        
+        if (!file_exists($this->uploadDir . '/' . $imageProcess->getResultImageName())) {
+            error_log("WARNING: Result file does not exist!");
+        }
+
         return $this->render('background_remover/success.html.twig', [
             'imageProcess' => $imageProcess
         ]);
@@ -113,19 +142,16 @@ class BackgroundRemoverController extends AbstractController
     }
 
     #[Route('/download/{id}', name: 'app_background_remover_download')]
-    public function download(BackgroundRemover $image): Response
+    public function download(ImageProcess $imageProcess): Response
     {
-        // Check if the user has access to this image
-        if ($this->getUser() && $image->getUserId() !== $this->getUser()->getId()) {
-            throw $this->createAccessDeniedException('You do not have access to this image.');
-        }
-
-        $filePath = $this->uploadDir . '/' . $image->getFileName();
+        $filePath = $this->uploadDir . '/' . $imageProcess->getResultImageName();
+        error_log("Download requested for file: " . $filePath);
         
         if (!file_exists($filePath)) {
+            error_log("ERROR: Download file not found: " . $filePath);
             throw $this->createNotFoundException('File not found.');
         }
 
-        return $this->file($filePath, $image->getOriginalName());
+        return $this->file($filePath);
     }
 } 
