@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Take Quiz: {{ quiz.title }} - Habesha Tools{% endblock %}
+{% block title %}{{ quiz.title }} - Habesha Tools{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -43,74 +43,39 @@
 {% block body %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ path('app_quiz') }}">Quizzes</a></li>
-                    <li class="breadcrumb-item"><a href="{{ path('app_quiz_show', {'id': quiz.id}) }}">{{ quiz.title }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Take Quiz</li>
-                </ol>
-            </nav>
-
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="h3 mb-0">{{ quiz.title }}</h1>
-                        <div class="text-muted">
-                            Question <span id="current-question">1</span> of {{ quiz.questions|length }}
-                        </div>
-                    </div>
+                    <h1 class="card-title text-center mb-4">{{ quiz.title }}</h1>
+                    <p class="text-center text-muted mb-4">{{ quiz.description }}</p>
 
-                    <div class="progress mb-4">
-                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                    </div>
-
-                    <form id="quiz-form" action="{{ path('app_quiz_submit', {'id': quiz.id}) }}" method="post">
-                        <div id="quiz-container">
-                            {% for question in quiz.questions|sort((a, b) => a.orderNumber <=> b.orderNumber) %}
-                                <div class="question-card {% if loop.first %}active{% endif %}" 
-                                     data-question-index="{{ loop.index0 }}"
-                                     data-correct-option="{{ question.correctOption }}">
-                                    <h5 class="card-title mb-4">{{ question.questionText }}</h5>
+                    <form id="quiz-form" class="mt-4">
+                        {% for question in quiz.questions %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Question {{ loop.index }}</h5>
+                                    <p class="card-text">{{ question.text }}</p>
                                     <div class="options">
                                         {% for option in question.options %}
-                                            <button type="button" 
-                                                    class="btn btn-outline-secondary option-button"
-                                                    data-option-index="{{ loop.index0 }}"
-                                                    data-question-index="{{ loop.parent.loop.index0 }}">
-                                                {{ option }}
-                                            </button>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" 
+                                                       name="q{{ loop.parent.loop.index0 }}" 
+                                                       value="{{ loop.index0 }}" 
+                                                       id="q{{ loop.parent.loop.index0 }}o{{ loop.index0 }}"
+                                                       required>
+                                                <label class="form-check-label" for="q{{ loop.parent.loop.index0 }}o{{ loop.index0 }}">
+                                                    {{ option.text }}
+                                                </label>
+                                            </div>
                                         {% endfor %}
-                                        <input type="hidden" name="answers[{{ loop.index0 }}]" value="">
                                     </div>
                                 </div>
-                            {% endfor %}
-                        </div>
+                            </div>
+                        {% endfor %}
 
-                        <div id="results-container" class="text-center">
-                            <h2 class="mb-4">Quiz Results</h2>
-                            <div class="display-4 mb-3">
-                                <span id="correct-answers">0</span>/<span id="total-questions">{{ quiz.questions|length }}</span>
-                            </div>
-                            <div class="h5 mb-4">
-                                Score: <span id="score-percentage">0</span>%
-                            </div>
-                            <div class="mb-4">
-                                <a href="{{ path('app_quiz_take', {'id': quiz.id}) }}" class="btn btn-primary me-2">
-                                    <i class="bi bi-arrow-clockwise"></i> Try Again
-                                </a>
-                                <a href="{{ path('app_quiz') }}" class="btn btn-outline-secondary">
-                                    <i class="bi bi-list"></i> Back to Quizzes
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between mt-4" id="navigation-buttons">
-                            <button type="button" class="btn btn-outline-primary" id="prev-button" disabled>
-                                <i class="bi bi-arrow-left"></i> Previous
-                            </button>
-                            <button type="button" class="btn btn-primary" id="next-button">
-                                Next <i class="bi bi-arrow-right"></i>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Submit Quiz
                             </button>
                         </div>
                     </form>
@@ -119,110 +84,37 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const quizContainer = document.getElementById('quiz-container');
-            const resultsContainer = document.getElementById('results-container');
-            const navigationButtons = document.getElementById('navigation-buttons');
-            const prevButton = document.getElementById('prev-button');
-            const nextButton = document.getElementById('next-button');
-            const currentQuestionSpan = document.getElementById('current-question');
-            const progressBar = document.querySelector('.progress-bar');
-            const quizForm = document.getElementById('quiz-form');
-            
-            const questions = document.querySelectorAll('.question-card');
-            const totalQuestions = questions.length;
-            let currentQuestionIndex = 0;
-            let userAnswers = new Array(totalQuestions).fill(null);
-            
-            function updateNavigation() {
-                prevButton.disabled = currentQuestionIndex === 0;
-                if (currentQuestionIndex === totalQuestions - 1) {
-                    nextButton.innerHTML = 'Finish <i class="bi bi-check-lg"></i>';
-                } else {
-                    nextButton.innerHTML = 'Next <i class="bi bi-arrow-right"></i>';
-                }
-                
-                currentQuestionSpan.textContent = currentQuestionIndex + 1;
-                progressBar.style.width = `${((currentQuestionIndex + 1) / totalQuestions) * 100}%`;
-            }
-            
-            function showQuestion(index) {
-                questions.forEach(q => q.classList.remove('active'));
-                questions[index].classList.add('active');
-                currentQuestionIndex = index;
-                updateNavigation();
-            }
-            
-            function calculateResults() {
-                let correctCount = 0;
-                questions.forEach((question, index) => {
-                    const correctOption = parseInt(question.dataset.correctOption);
-                    if (userAnswers[index] === correctOption) {
-                        correctCount++;
-                    }
-                });
-                
-                const percentage = Math.round((correctCount / totalQuestions) * 100);
-                document.getElementById('correct-answers').textContent = correctCount;
-                document.getElementById('score-percentage').textContent = percentage;
-            }
-            
-            function showResults() {
-                quizContainer.style.display = 'none';
-                navigationButtons.style.display = 'none';
-                resultsContainer.style.display = 'block';
-                calculateResults();
-            }
-            
-            // Handle option selection
-            document.querySelectorAll('.option-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    const questionCard = this.closest('.question-card');
-                    const questionIndex = parseInt(questionCard.dataset.questionIndex);
-                    const optionIndex = parseInt(this.dataset.optionIndex);
-                    
-                    // Remove previous selection
-                    questionCard.querySelectorAll('.option-button').forEach(btn => {
-                        btn.classList.remove('selected');
-                    });
-                    
-                    // Add new selection
-                    this.classList.add('selected');
-                    userAnswers[questionIndex] = optionIndex;
-                    
-                    // Update hidden input
-                    const hiddenInput = questionCard.querySelector('input[type="hidden"]');
-                    hiddenInput.value = optionIndex;
-                    
-                    // Enable next button if it was disabled
-                    nextButton.disabled = false;
-                });
-            });
-            
-            // Navigation button handlers
-            prevButton.addEventListener('click', function() {
-                if (currentQuestionIndex > 0) {
-                    showQuestion(currentQuestionIndex - 1);
-                }
-            });
-            
-            nextButton.addEventListener('click', function() {
-                if (currentQuestionIndex === totalQuestions - 1) {
-                    // Submit the form
-                    quizForm.submit();
-                } else if (currentQuestionIndex < totalQuestions - 1) {
-                    showQuestion(currentQuestionIndex + 1);
-                }
-            });
-            
-            // Initialize
-            showQuestion(0);
-            nextButton.disabled = true;
+{{ parent() }}
+<script>
+document.getElementById('quiz-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const answers = Array.from(document.querySelectorAll('input[type="radio"]:checked')).map(input => ({
+        questionIndex: parseInt(input.name.substring(1)),
+        answerIndex: parseInt(input.value)
+    }));
+
+    try {
+        const response = await fetch('{{ path('app_quiz_submit', {'id': quiz.id}) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ answers: answers })
         });
-    </script>
+
+        if (!response.ok) {
+            throw new Error('Failed to submit quiz');
+        }
+
+        const result = await response.json();
+        window.location.href = '{{ path('app_quiz_result', {'id': quiz.id}) }}';
+    } catch (error) {
+        alert('Error submitting quiz: ' + error.message);
+    }
+});
+</script>
+{% endblock %}
 {% endblock %} 
