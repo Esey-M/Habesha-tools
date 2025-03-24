@@ -6,6 +6,7 @@ use App\Entity\ImageProcess;
 use App\Form\BackgroundRemoverType;
 use App\Repository\ImageProcessRepository;
 use App\Service\BackgroundRemovalService;
+use App\Service\ImageCleanupService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +21,8 @@ class BackgroundRemoverController extends AbstractController
 
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private BackgroundRemovalService $backgroundRemovalService
+        private BackgroundRemovalService $backgroundRemovalService,
+        private ImageCleanupService $imageCleanupService
     ) {
         $this->uploadDir = dirname(__DIR__, 2) . '/public/uploads/background-remover';
         $this->privateUploadDir = dirname(__DIR__, 2) . '/private/uploads/background-remover';
@@ -36,6 +38,9 @@ class BackgroundRemoverController extends AbstractController
     #[Route('/', name: 'app_background_remover')]
     public function index(Request $request): Response
     {
+        // Cleanup old images
+        $this->imageCleanupService->cleanup();
+
         $form = $this->createForm(BackgroundRemoverType::class);
         $form->handleRequest($request);
 
@@ -56,6 +61,9 @@ class BackgroundRemoverController extends AbstractController
 
                 // Save processed image in public directory
                 $processedImage->save($publicPath);
+
+                // Track the image for cleanup
+                $this->imageCleanupService->trackImage($fileName);
 
                 // Create a record in the database
                 $image = new BackgroundRemover();
@@ -91,6 +99,9 @@ class BackgroundRemoverController extends AbstractController
     #[Route('/result/{id}', name: 'app_background_remover_result')]
     public function result(BackgroundRemover $image): Response
     {
+        // Cleanup old images
+        $this->imageCleanupService->cleanup();
+
         // Check if the user has access to this image
         if ($this->getUser() && $image->getUserId() !== $this->getUser()->getId()) {
             throw $this->createAccessDeniedException('You do not have access to this image.');
