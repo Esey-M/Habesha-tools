@@ -54,7 +54,7 @@
                             <div class="card mb-3">
                                 <div class="card-body">
                                     <h5 class="card-title">Question {{ loop.index }}</h5>
-                                    <p class="card-text">{{ question.text }}</p>
+                                    <p class="card-text">{{ question.questionText }}</p>
                                     <div class="options">
                                         {% for option in question.options %}
                                             <div class="form-check">
@@ -64,7 +64,7 @@
                                                        id="q{{ loop.parent.loop.index0 }}o{{ loop.index0 }}"
                                                        required>
                                                 <label class="form-check-label" for="q{{ loop.parent.loop.index0 }}o{{ loop.index0 }}">
-                                                    {{ option.text }}
+                                                    {{ option }}
                                                 </label>
                                             </div>
                                         {% endfor %}
