@@ -15,6 +15,10 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        public: false
+        bind:
+            $privateUploadDir: '%kernel.project_dir%/private/uploads'
+            $publicUploadDir: '%kernel.project_dir%/public/uploads'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -38,3 +42,8 @@ services:
             $privateUploadDir: '%kernel.project_dir%/private/uploads/background-remover'
             $requestStack: '@request_stack'
             $filesystem: '@filesystem'
+
+    App\Command\CleanupProcessedImagesCommand:
+        arguments:
+            $privateUploadDir: '%kernel.project_dir%/private/uploads'
+            $publicUploadDir: '%kernel.project_dir%/public/uploads'
