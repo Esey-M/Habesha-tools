@@ -1,6 +1,39 @@
 monolog:
     channels:
-        - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - deprecation
+        - security
+        - background_remover
+        - logo_remover
+
+    handlers:
+        security:
+            type: stream
+            path: "%kernel.logs_dir%/security.log"
+            level: debug
+            channels: ["security"]
+
+        background_remover:
+            type: stream
+            path: "%kernel.logs_dir%/background_remover.log"
+            level: debug
+            channels: ["background_remover"]
+
+        logo_remover:
+            type: stream
+            path: "%kernel.logs_dir%/logo_remover.log"
+            level: debug
+            channels: ["logo_remover"]
+
+        main:
+            type: stream
+            path: php://stderr
+            level: debug
+            channels: ["!event"]
+
+        console:
+            type: console
+            process_psr_3_messages: false
+            channels: ["!event", "!doctrine", "!console"]
 
 when@dev:
     monolog:
@@ -10,14 +43,6 @@ when@dev:
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
                 channels: ["!event"]
-            # uncomment to get logging in your browser
-            # you may have to allow bigger header sizes in your Web server configuration
-            #firephp:
-            #    type: firephp
-            #    level: info
-            #chromephp:
-            #    type: chromephp
-            #    level: info
             console:
                 type: console
                 process_psr_3_messages: false
@@ -45,12 +70,11 @@ when@prod:
                 action_level: error
                 handler: nested
                 excluded_http_codes: [404, 405]
-                buffer_size: 50 # How many messages should be saved? Prevent memory leaks
+                buffer_size: 50
             nested:
                 type: stream
                 path: php://stderr
                 level: debug
-                formatter: monolog.formatter.json
             console:
                 type: console
                 process_psr_3_messages: false
@@ -58,5 +82,4 @@ when@prod:
             deprecation:
                 type: stream
                 channels: [deprecation]
-                path: php://stderr
-                formatter: monolog.formatter.json
+                path: "%kernel.logs_dir%/%kernel.environment%.deprecations.log" 

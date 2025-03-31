@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Quiz - Coming Soon - Habesha Tools{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="card shadow-sm">
+                <div class="card-body py-5">
+                    <h1 class="display-4 mb-4">🎯 Quiz Feature Coming Soon!</h1>
+                    
+                    <div class="mb-4">
+                        <i class="fas fa-tools fa-3x text-primary mb-3"></i>
+                    </div>
+                    
+                    <p class="lead mb-4">
+                        We're working hard to bring you an exciting new quiz feature. Stay tuned!
+                    </p>
+                    
+                    <div class="features mb-4">
+                        <h3 class="h5 mb-3">What to expect:</h3>
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <ul class="list-unstyled text-start">
+                                    <li class="mb-2">✨ Interactive Learning Experience</li>
+                                    <li class="mb-2">📚 Comprehensive Question Bank</li>
+                                    <li class="mb-2">🏆 Achievement System</li>
+                                    <li class="mb-2">📊 Progress Tracking</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ path('app_home') }}" class="btn btn-primary btn-lg">
+                        Return to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

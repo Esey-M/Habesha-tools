@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class CleanupImagesCommand extends Command
 {
     protected static $defaultName = 'app:cleanup-images';
+    protected static $defaultDescription = 'Cleans up old images and their database records';
 
     private EntityManagerInterface $entityManager;
     private ImageProcessRepository $imageProcessRepository;
@@ -25,16 +26,16 @@ class CleanupImagesCommand extends Command
         ImageProcessRepository $imageProcessRepository,
         ParameterBagInterface $params
     ) {
-        parent::__construct();
+        parent::__construct(self::$defaultName);
         $this->entityManager = $entityManager;
         $this->imageProcessRepository = $imageProcessRepository;
         $this->uploadDir = $params->get('app.upload_directory');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription('Cleans up old images and their database records')
+            ->setDescription(self::$defaultDescription)
             ->addOption(
                 'days',
                 'd',

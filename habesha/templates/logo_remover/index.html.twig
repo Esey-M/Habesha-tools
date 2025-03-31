@@ -8,6 +8,15 @@
         <div class="col-lg-8">
             <h1 class="mb-4">Logo Remover</h1>
             
+            {% if not isAuthenticated %}
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Free Usage: {{ remainingFreeUsage }} images remaining today.
+                    <a href="{{ path('app_register') }}" class="alert-link">Register</a> or
+                    <a href="{{ path('app_login') }}" class="alert-link">login</a> for unlimited access!
+                </div>
+            {% endif %}
+
             <div class="alert alert-info mb-4">
                 <i class="bi bi-info-circle me-2"></i>
                 Please note: Uploaded and processed images will be automatically deleted after 7 days.
@@ -31,34 +40,49 @@
             {% if recent_processes|length > 0 %}
                 <div class="mt-5">
                     <h2 class="h4 mb-4">Recent Images</h2>
-                    <div class="list-group">
+                    <div class="row">
                         {% for process in recent_processes %}
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">{{ process.imageName }}</h6>
-                                        <small class="text-muted">
-                                            Uploaded on {{ process.updatedAt|date('M d, Y') }}
-                                            {% if process.resultImageName %}
-                                                • Processed
-                                            {% endif %}
-                                        </small>
-                                        <br>
-                                        <small class="text-danger">
-                                            Expires on {{ process.expiresAt|date('M d, Y') }}
-                                        </small>
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-transparent">
+                                        <h6 class="mb-0">{{ process.imageName }}</h6>
                                     </div>
-                                    <div>
-                                        {% if process.resultImageName %}
-                                            <a href="{{ path('app_logo_remover_success', {'id': process.id}) }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-eye"></i> View Result
+                                    
+                                    {% if process.imageName %}
+                                        <img src="{{ asset('uploads/images/' ~ process.imageName) }}" 
+                                             class="card-img-top" 
+                                             alt="Original image"
+                                             style="max-height: 200px; object-fit: contain;">
+                                    {% endif %}
+                                    
+                                    {% if process.resultImageName %}
+                                        <div class="card-header bg-transparent border-top">
+                                            <h6 class="mb-0">Processed Result</h6>
+                                        </div>
+                                        <img src="{{ asset('uploads/images/' ~ process.resultImageName) }}" 
+                                             class="card-img-top" 
+                                             alt="Processed image"
+                                             style="max-height: 200px; object-fit: contain;">
+                                        <div class="card-body">
+                                            <div class="d-grid gap-2">
+                                                <a href="{{ asset('uploads/images/' ~ process.resultImageName) }}" 
+                                                   class="btn btn-success" 
+                                                   download="{{ process.resultImageName }}">
+                                                    <i class="bi bi-download me-2"></i>Download Result
+                                                </a>
+                                            </div>
+                                            <p class="card-text text-muted mt-2 text-center">
+                                                <small>Processed {{ process.updatedAt|date('M d, Y H:i') }}</small>
+                                            </p>
+                                        </div>
+                                    {% else %}
+                                        <div class="card-body">
+                                            <a href="{{ path('app_logo_remover_edit', {'id': process.id}) }}" 
+                                               class="btn btn-primary d-block">
+                                                <i class="bi bi-pencil me-2"></i>Edit Image
                                             </a>
-                                        {% else %}
-                                            <a href="{{ path('app_logo_remover_edit', {'id': process.id}) }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-pencil"></i> Edit
-                                            </a>
-                                        {% endif %}
-                                    </div>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}

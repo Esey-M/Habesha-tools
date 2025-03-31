@@ -3,74 +3,274 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}Welcome to Habesha Tools{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚕️</text></svg>">
+        <meta http-equiv="X-Content-Type-Options" content="nosniff">
+        <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval' data: pagead2.googlesyndication.com googleads.g.doubleclick.net; img-src 'self' https: data: blob: pagead2.googlesyndication.com googleads.g.doubleclick.net; font-src 'self' https: data:; frame-src 'self' https: googleads.g.doubleclick.net;">
+        <meta name="referrer" content="strict-origin-when-cross-origin">
+        <meta name="robots" content="index, follow">
+        <meta name="description" content="Habesha Tools - Free online tools for background and logo removal">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap Icons -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+        <!-- Font Awesome -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         {% block stylesheets %}
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-            {{ importmap('app') }}
+            <style>
+                .ad-container {
+                    text-align: center;
+                    margin: 20px 0;
+                    min-height: 90px;
+                }
+                .sidebar-ad {
+                    position: sticky;
+                    top: 20px;
+                    min-height: 600px;
+                }
+                @media (max-width: 768px) {
+                    .sidebar-ad {
+                        display: none;
+                    }
+                }
+                .footer-links a {
+                    color: #fff;
+                    text-decoration: none;
+                    margin: 0 10px;
+                }
+                .footer-links a:hover {
+                    text-decoration: underline;
+                }
+                #cookie-notice {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    background: rgba(0, 0, 0, 0.9);
+                    color: white;
+                    padding: 1rem;
+                    z-index: 1000;
+                    display: none;
+                }
+                .navbar-nav .nav-link {
+                    padding: 0.5rem 1rem;
+                }
+                .profile-menu .dropdown-item i {
+                    width: 1.25rem;
+                    margin-right: 0.5rem;
+                }
+                .coming-soon-badge {
+                    font-size: 0.7em;
+                    padding: 2px 6px;
+                    background-color: #ffc107;
+                    color: #000;
+                    border-radius: 10px;
+                    margin-left: 5px;
+                    vertical-align: middle;
+                }
+            </style>
         {% endblock %}
 
         {% block javascripts %}
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <!-- AdSense initialization -->
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID" crossorigin="anonymous"></script>
+            <script>
+                // AdSense auto ads with GDPR compliance
+                window.adsbygoogle = window.adsbygoogle || [];
+                
+                function initAds() {
+                    if (localStorage.getItem('cookieConsent') === 'true') {
+                        adsbygoogle.push({
+                            google_ad_client: "ca-pub-YOUR_PUBLISHER_ID",
+                            enable_page_level_ads: true,
+                            overlays: {bottom: true}
+                        });
+                    }
+                }
+                
+                // Cookie consent handler with privacy considerations
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (!localStorage.getItem('cookieConsent')) {
+                        document.getElementById('cookie-notice').style.display = 'block';
+                    } else {
+                        initAds();
+                    }
+                });
+
+                function acceptCookies() {
+                    localStorage.setItem('cookieConsent', 'true');
+                    document.getElementById('cookie-notice').style.display = 'none';
+                    initAds();
+                }
+            </script>
+            <!-- Google Analytics -->
+            {% if app.environment == 'prod' %}
+            <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA_ID"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'YOUR_GA_ID', {
+                    'anonymize_ip': true,
+                    'cookie_flags': 'SameSite=None;Secure'
+                });
+            </script>
+            {% endif %}
         {% endblock %}
     </head>
-    <body class="bg-light">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" href="{{ path('app_home') }}">
-                    <i class="bi bi-tools"></i> Habesha Tools
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <a class="navbar-brand" href="{{ path('app_home') }}">Habesha Tools</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_background_remover') }}">Background Remover</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_logo_remover') }}">Logo Remover</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_quiz') }}">
+                                Quiz
+                                <span class="badge bg-warning text-dark">Coming Soon</span>
+                            </a>
+                        </li>
+                    </ul>
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_home') }}">
-                                <i class="bi bi-house"></i> Home
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_background_remover') }}">
-                                <i class="bi bi-image"></i> Background Remover
-                            </a>
-                        </li>
+                        {% if app.user %}
+                            <li class="nav-item dropdown profile-menu">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle me-1"></i>
+                                    {{ app.user.name }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <span class="dropdown-item-text text-muted">
+                                            <i class="bi bi-envelope"></i>
+                                            {{ app.user.email }}
+                                        </span>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('app_logout') }}">
+                                            <i class="bi bi-box-arrow-right"></i>
+                                            Sign Out
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_login') }}">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>
+                                    Sign In
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_register') }}">
+                                    <i class="bi bi-person-plus me-1"></i>
+                                    Register
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
         </nav>
 
-        <main class="container my-4">
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="container-fluid mt-4">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="sidebar-ad">
+                        <!-- Sidebar Ad -->
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                             data-ad-slot="SIDEBAR_AD_SLOT"
+                             data-ad-format="vertical"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                    </div>
                 </div>
-            {% endfor %}
+                <div class="col-md-8">
+                    <div class="ad-container">
+                        <!-- Top Horizontal Ad -->
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                             data-ad-slot="TOP_AD_SLOT"
+                             data-ad-format="horizontal"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                    </div>
 
-            {% for message in app.flashes('error') %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    {% block body %}{% endblock %}
+
+                    <div class="ad-container">
+                        <!-- Bottom Horizontal Ad -->
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                             data-ad-slot="BOTTOM_AD_SLOT"
+                             data-ad-format="horizontal"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                    </div>
                 </div>
-            {% endfor %}
+                <div class="col-md-2">
+                    <div class="sidebar-ad">
+                        <!-- Sidebar Ad 2 -->
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                             data-ad-slot="SIDEBAR_AD_SLOT_2"
+                             data-ad-format="vertical"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            {% block body %}{% endblock %}
-        </main>
-
-        <footer class="bg-dark text-light py-4 mt-5">
+        <footer class="bg-dark text-light mt-5 py-3">
             <div class="container">
                 <div class="row">
                     <div class="col-md-6">
-                        <h5>Habesha Tools</h5>
-                        <p>Your one-stop solution for image processing and enhancement.</p>
-                    </div>
-                    <div class="col-md-6 text-md-end">
                         <p>&copy; {{ "now"|date("Y") }} Habesha Tools. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-end footer-links">
+                        <a href="{{ path('app_legal_terms') }}">Terms of Service</a>
+                        <a href="{{ path('app_legal_privacy') }}">Privacy Policy</a>
                     </div>
                 </div>
             </div>
         </footer>
+
+        <div id="cookie-notice">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-9">
+                        <p class="mb-md-0">We use cookies to improve your experience and show you relevant advertising. To learn more, read our <a href="{{ path('app_legal_privacy') }}" class="text-white text-decoration-underline">Privacy Policy</a>.</p>
+                    </div>
+                    <div class="col-md-3 text-md-end">
+                        <button onclick="acceptCookies()" class="btn btn-light">Accept</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

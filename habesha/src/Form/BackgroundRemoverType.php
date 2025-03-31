@@ -16,14 +16,15 @@ class BackgroundRemoverType extends AbstractType
             ->add('imageFile', VichImageType::class, [
                 'required' => true,
                 'allow_delete' => false,
-                'delete_label' => 'Delete image',
                 'download_uri' => false,
-                'image_uri' => true,
+                'image_uri' => false,
                 'asset_helper' => true,
                 'attr' => [
                     'class' => 'form-control',
                     'accept' => 'image/*'
-                ]
+                ],
+                'label' => 'Select Image',
+                'help' => 'Choose an image to remove the background from.'
             ])
         ;
     }

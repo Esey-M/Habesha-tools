@@ -6,8 +6,10 @@ use App\Repository\ImageProcessRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use DateTime;
 
 #[ORM\Entity(repositoryClass: ImageProcessRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 #[Vich\Uploadable]
 class ImageProcess
 {
@@ -16,40 +18,60 @@ class ImageProcess
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Vich\UploadableField(mapping: 'images', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageName = null;
 
-    #[Vich\UploadableField(mapping: 'process_images', fileNameProperty: 'imageName')]
-    private ?File $imageFile = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
-
-    #[ORM\Column(length: 50)]
-    private ?string $processType = null;
+    #[Vich\UploadableField(mapping: 'result_images', fileNameProperty: 'resultImageName')]
+    private ?File $resultImageFile = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $resultImageName = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $processType = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $expiresAt = null;
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column]
-    private ?bool $isPermanent = false;
+    private ?\DateTimeImmutable $expiresAt = null;
 
     public function __construct()
     {
-        $this->updatedAt = new \DateTimeImmutable();
         $this->createdAt = new \DateTimeImmutable();
-        $this->expiresAt = (new \DateTimeImmutable())->modify('+7 days');
+        $this->updatedAt = new \DateTimeImmutable();
+        $this->expiresAt = new \DateTimeImmutable('+7 days');
+    }
+
+    #[ORM\PreUpdate]
+    public function updateTimestamps(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
     }
 
     public function getImageName(): ?string
@@ -63,28 +85,28 @@ class ImageProcess
         return $this;
     }
 
-    public function getImageFile(): ?File
+    public function setResultImageFile(?File $resultImageFile = null): void
     {
-        return $this->imageFile;
-    }
+        $this->resultImageFile = $resultImageFile;
 
-    public function setImageFile(?File $imageFile = null): void
-    {
-        $this->imageFile = $imageFile;
-
-        if (null !== $imageFile) {
+        if (null !== $resultImageFile) {
             $this->updatedAt = new \DateTimeImmutable();
         }
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getResultImageFile(): ?File
     {
-        return $this->updatedAt;
+        return $this->resultImageFile;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function getResultImageName(): ?string
     {
-        $this->updatedAt = $updatedAt;
+        return $this->resultImageName;
+    }
+
+    public function setResultImageName(?string $resultImageName): static
+    {
+        $this->resultImageName = $resultImageName;
         return $this;
     }
 
@@ -99,14 +121,25 @@ class ImageProcess
         return $this;
     }
 
-    public function getResultImageName(): ?string
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->resultImageName;
+        return $this->createdAt;
     }
 
-    public function setResultImageName(?string $resultImageName): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->resultImageName = $resultImageName;
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 
@@ -119,21 +152,5 @@ class ImageProcess
     {
         $this->expiresAt = $expiresAt;
         return $this;
-    }
-
-    public function isPermanent(): ?bool
-    {
-        return $this->isPermanent;
-    }
-
-    public function setIsPermanent(bool $isPermanent): static
-    {
-        $this->isPermanent = $isPermanent;
-        return $this;
-    }
-
-    public function isExpired(): bool
-    {
-        return !$this->isPermanent && $this->expiresAt < new \DateTimeImmutable();
     }
 } 

@@ -11,11 +11,21 @@ framework:
         handler_id: null
         cookie_secure: auto
         cookie_samesite: lax
+        storage_factory_id: session.storage.factory.native
 
     #esi: true
     #fragments: true
     php_errors:
         log: true
+    rate_limiter:
+        background_remover:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '15 minutes'
+        logo_remover:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '15 minutes'
 
 when@test:
     framework:

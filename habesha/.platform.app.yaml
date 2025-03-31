@@ -1,0 +1,66 @@
+name: app
+
+type: php:8.2
+
+build:
+    flavor: none
+
+dependencies:
+    php:
+        composer/composer: "^2"
+
+runtime:
+    extensions:
+        - apcu
+        - mbstring
+        - sodium
+        - ctype
+        - iconv
+        - pdo_mysql
+        
+relationships:
+    database: "db:mysql"
+
+web:
+    locations:
+        "/":
+            root: "public"
+            expires: 1h
+            passthru: "/index.php"
+            allow: true
+            rules:
+                \.(css|js|gif|jpe?g|png|ttf|eot|woff2?|otf|mp4|mov|ogg|mp3|pdf|ico|bmp|dll|ico|svg|svgz|webp|docx?|xlsx?|pptx?|tiff|wav|mid|midi|bmp|rtf)$:
+                    allow: true
+                    expires: 1w
+
+disk: 2048
+
+mounts:
+    "/public/uploads": "shared:files/uploads"
+    "/var/cache": "shared:files/cache"
+    "/var/log": "shared:files/log"
+    "/var/sessions": "shared:files/sessions"
+
+hooks:
+    build: |
+        set -e
+        composer install --no-dev --optimize-autoloader
+        php bin/console cache:clear
+        php bin/console assets:install --no-debug
+    deploy: |
+        set -e
+        php bin/console doctrine:migrations:migrate --no-interaction
+
+crons:
+    cleanup:
+        spec: '0 0 * * *'
+        cmd: 'php bin/console app:cleanup-uploads'
+
+variables:
+    php:
+        memory_limit: 512M
+
+dependencies:
+    python:
+        rembg: "*"
+        onnxruntime: "*" 

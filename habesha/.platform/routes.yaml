@@ -1,0 +1,11 @@
+"https://{default}/":
+    type: upstream
+    upstream: "app:http"
+    cache:
+        enabled: true
+        headers: ['Accept', 'Accept-Language']
+    redirects:
+        paths:
+            '^/uploads/.*':
+                to: "/uploads/{rest}"
+                regexp: true 

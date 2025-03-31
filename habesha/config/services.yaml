@@ -5,16 +5,29 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app.remove_bg_api_key: '%env(REMOVE_BG_API_KEY)%'
+    upload_directory: '%kernel.project_dir%/public/uploads/images'
+    python_script_path: '%kernel.project_dir%/scripts/remove_background.py'
+    python_script_path_logo: '%kernel.project_dir%/scripts/remove_logo.py'
+    python_path: '%kernel.project_dir%/venv/bin/python3'
+    app.rembg_api_key: '%env(REMBG_API_KEY)%'
     app.upload_directory: '%kernel.project_dir%/public/uploads/images'
     app.python_script_path: '%kernel.project_dir%/scripts/remove_background.py'
-    app.python_script_path_logo: '%kernel.project_dir%/scripts/remove_logo.py'
-    app.python_path: '%kernel.project_dir%/venv/bin/python3.13'
+    app.python_path: '%env(PYTHON_PATH)%'
+    api_key: '%env(API_KEY)%'
+    logo_removal_script_path: '%kernel.project_dir%/scripts/remove_logo.py'
+    cache_directory: '%kernel.project_dir%/var/cache'
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        public: false
+        bind:
+            $rembgApiKey: '%app.rembg_api_key%'
+            $uploadDirectory: '%app.upload_directory%'
+            $pythonScriptPath: '%app.python_script_path%'
+            $pythonPath: '%app.python_path%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -31,3 +44,14 @@ services:
     App\Service\BackgroundRemovalService:
         arguments:
             $params: '@parameter_bag'
+            $logger: '@logger'
+            $entityManager: '@doctrine.orm.entity_manager'
+
+    App\Service\LogoRemovalService:
+        arguments:
+            $params: '@parameter_bag'
+            $logger: '@logger'
+
+    App\Service\UsageLimitService:
+        arguments:
+            $requestStack: '@request_stack'

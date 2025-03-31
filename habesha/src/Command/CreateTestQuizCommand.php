@@ -13,19 +13,20 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class CreateTestQuizCommand extends Command
 {
     protected static $defaultName = 'app:create-test-quiz';
+    protected static $defaultDescription = 'Creates a test quiz with 10 questions about Ethiopian history and culture';
 
     private EntityManagerInterface $entityManager;
     private SymfonyStyle $io;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        parent::__construct();
+        parent::__construct(self::$defaultName);
         $this->entityManager = $entityManager;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setDescription('Creates a test quiz with 10 questions about Ethiopian history and culture');
+        $this->setDescription(self::$defaultDescription);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
